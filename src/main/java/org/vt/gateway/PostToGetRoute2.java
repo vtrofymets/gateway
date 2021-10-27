@@ -1,7 +1,5 @@
 package org.vt.gateway;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.route.Route;
@@ -14,24 +12,24 @@ import reactor.core.publisher.Flux;
 /**
  *
  */
-@Component
+//@Component
 @RequiredArgsConstructor
 @Slf4j
-public class PostToGetRoute implements RouteLocator {
+public class PostToGetRoute2 implements RouteLocator {
 
     private final RouteLocatorBuilder builder;
-    private final ObjectMapper objectMapper;
+    private final JsonMapper jsonMapper;
 
     @Override
     public Flux<Route> getRoutes() {
         return builder.routes()
                 .route("id", fn -> fn.path("/test")
-                        .and()
-                        .readBody(String.class, r -> true)
+                                                .and()
+                                                .readBody(String.class, r -> true)
                         .filters(f -> f.filter((exchange, chain) -> {
                             String body = exchange.getAttribute("cachedRequestBodyObject");
                             log.info("REQUEST=[{}]", body);
-                            var flood = mapper(body, Flood.class);
+                            var flood = jsonMapper.mapper(body, Flood.class);
                             var request = exchange.mutate()
                                     .request(b -> b.method(HttpMethod.GET)
                                             .path("/basic/" + flood.getId()))
@@ -42,14 +40,4 @@ public class PostToGetRoute implements RouteLocator {
                 .build()
                 .getRoutes();
     }
-
-    private <T> T mapper(String body, Class<T> clazz) {
-        try {
-            return objectMapper.readValue(body, clazz);
-        } catch (JsonProcessingException e) {
-            log.error("ERROR", e);
-            throw new RuntimeException();
-        }
-    }
-
 }
