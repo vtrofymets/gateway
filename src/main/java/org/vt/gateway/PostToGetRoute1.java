@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 /**
  *
  */
-@Component
+//@Component
 @RequiredArgsConstructor
 @Slf4j
 public class PostToGetRoute1 implements RouteLocator {

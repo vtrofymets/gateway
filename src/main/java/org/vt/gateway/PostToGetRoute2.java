@@ -12,7 +12,7 @@ import reactor.core.publisher.Flux;
 /**
  *
  */
-//@Component
+@Component
 @RequiredArgsConstructor
 @Slf4j
 public class PostToGetRoute2 implements RouteLocator {
@@ -25,11 +25,11 @@ public class PostToGetRoute2 implements RouteLocator {
         return builder.routes()
                 .route("id", fn -> fn.path("/test")
                                                 .and()
-                                                .readBody(String.class, r -> true)
+                                                .readBody(Flood.class, r -> true)
                         .filters(f -> f.filter((exchange, chain) -> {
-                            String body = exchange.getAttribute("cachedRequestBodyObject");
-                            log.info("REQUEST=[{}]", body);
-                            var flood = jsonMapper.mapper(body, Flood.class);
+                            Flood flood = exchange.getAttribute("cachedRequestBodyObject");
+                            log.info("REQUEST=[{}]", flood);
+//                            var flood = jsonMapper.mapper(body, Flood.class);
                             var request = exchange.mutate()
                                     .request(b -> b.method(HttpMethod.GET)
                                             .path("/basic/" + flood.getId()))
